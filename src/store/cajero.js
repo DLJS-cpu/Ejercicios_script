@@ -1,44 +1,77 @@
-import {defineStore} from 'pinia'
+import { defineStore } from 'pinia'
 
-export const useUsuariosStore = define('usuarios',{
-    state: function(){
-        return{
-            usuarios:[]
+export const useCajeroStore = defineStore('cajero', {
+    state: function() {
+        return {
+            clientes: []
         }
     },
     actions: {
-        agregarUsuario: function(nombre){
-            let nuevoUsuario = {
+        agregarCliente: function(nombre, montoInicial) {
+            let nuevoCliente = {
                 id: Date.now(),
                 nombre: nombre,
-                monto:[]
+                saldo: montoInicial || 0
             }
-            this.usuarios.push(nuevoUsuario)
+            this.clientes.push(nuevoCliente)
         },
-
-        deposito: function(idUsuario,depositoMonto) {
-            let usuario = this.usuarios.find(function(a){
-                return a.id == idUsuario
+        
+        editarNombreCliente: function(idCliente, nuevoNombre) {
+            let cliente = this.clientes.find(function(c) {
+                return c.id === idCliente
             })
-            if (usuario){
-                let deposito = {
-                    id: Date.now(),
-                    cantidad: depositoMonto,
-                    montoRegistrado:[]
-                }
-                usuario.monto.push(deposito)
+            if (cliente) {
+                cliente.nombre = nuevoNombre
             }
+        },
+        
+        eliminarCliente: function(idCliente) {
+            this.clientes = this.clientes.filter(function(c) {
+                return c.id !== idCliente
+            })
+        },
+        
+        depositarMonto: function(idCliente, monto) {
+            let cliente = this.clientes.find(function(c) {
+                return c.id === idCliente
+            })
+            if (cliente && monto > 0) {
+                cliente.saldo += monto
+            }
+        },
+        
+        retirarMonto: function(idCliente, monto) {
+            let cliente = this.clientes.find(function(c) {
+                return c.id === idCliente
+            })
+            if (cliente && monto > 0 && cliente.saldo >= monto) {
+                cliente.saldo -= monto
+                return true
+            }
+            return false
         }
     },
-    getters:{
-        todosLosUsuarios: function(state){
-            return state.usuarios
+    getters: {
+        todosLosClientes: function(state) {
+            return state.clientes
         },
-
-        totalUsuarios: function(state){
-            return state.usuarios.length
+        
+        totalClientes: function(state) {
+            return state.clientes.length
         },
-
-    
+        
+        obtenerClientePorId: function(state) {
+            return function(idCliente) {
+                return state.clientes.find(function(c) {
+                    return c.id === idCliente
+                })
+            }
+        },
+        
+        saldoTotal: function(state) {
+            return state.clientes.reduce(function(total, cliente) {
+                return total + cliente.saldo
+            }, 0)
+        }
     }
 })
