@@ -1,18 +1,18 @@
 <template>
-  <button @click="ejecutarAccion">{{ title }}</button>
+  <button :disabled="desabilitado" @click="accionar">
+    {{ title }}
+  </button>
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   title: {
-    type: String,
+    type:String,
     required: true
+  },
+  desabilitado:{
+    type: Boolean,
+    default: false
   }
 })
-
-const emit = defineEmits(['ejecutar-accion'])
-
-function ejecutarAccion() {
-  emit('ejecutar-accion')
-}
 </script>
